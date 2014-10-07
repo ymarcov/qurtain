@@ -26,6 +26,8 @@ private slots:
     void cleanupExpired();
     void newRestDialog();
     void refreshList();
+    void removeAll();
+    void removeSelected();
     void updateClock();
     void updateCurtainVisibility();
 
@@ -38,6 +40,7 @@ private:
     QList<QWidget*> curtain;
     QList<Rest*> rests;
     QDateTime curtainExpiration;
+    bool dirty;
 };
 
 #endif // MAINWINDOW_H

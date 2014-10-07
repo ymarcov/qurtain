@@ -16,13 +16,16 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    timer(new QTimer)
+    timer(new QTimer),
+    dirty(false)
 {
     ui->setupUi(this);
     setupCurtain();
 
     // connect signals & slots
     connect(ui->actionAdd, SIGNAL(triggered()), SLOT(newRestDialog()));
+    connect(ui->btnRemoveAll, SIGNAL(clicked()), SLOT(removeAll()));
+    connect(ui->btnRemoveSelected, SIGNAL(clicked()), SLOT(removeSelected()));
     connect(timer, SIGNAL(timeout()), SLOT(updateClock()));
     connect(timer, SIGNAL(timeout()), SLOT(updateCurtainVisibility()));
     connect(timer, SIGNAL(timeout()), SLOT(cleanupExpired()));
@@ -40,13 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete timer;
-
-    foreach (QWidget *screenCurtain, curtain)
-        delete screenCurtain;
-
-    foreach (Rest *r, rests)
-        delete r;
-
+    qDeleteAll(curtain);
+    removeAll();
     delete ui;
 }
 
@@ -54,7 +52,10 @@ void MainWindow::newRestDialog()
 {
     NewRestDialog dialog;
     if (dialog.exec() == NewRestDialog::Accepted)
+    {
         rests.append(dialog.rest());
+        dirty = true;
+    }
 }
 
 void MainWindow::updateClock()
@@ -101,12 +102,16 @@ void MainWindow::cleanupExpired()
         {
             iterator.remove();
             delete r;
+            dirty = true;
         }
     }
 }
 
 void MainWindow::refreshList()
 {
+    if (!dirty)
+        return;
+
     QStandardItemModel *model = new QStandardItemModel(0, 5);
 
     // create header
@@ -151,6 +156,24 @@ void MainWindow::refreshList()
     delete ui->tableView->model();
     ui->tableView->setModel(model);
     ui->tableView->resizeColumnsToContents();
+    dirty = false;
+}
+
+void MainWindow::removeAll()
+{
+    qDeleteAll(rests);
+    rests.clear();
+    dirty = true;
+}
+
+void MainWindow::removeSelected()
+{
+    QModelIndex idx = ui->tableView->currentIndex();
+    if (idx.isValid())
+    {
+        rests.erase(rests.begin() + idx.row());
+        dirty = true;
+    }
 }
 
 void MainWindow::setupCurtain()
