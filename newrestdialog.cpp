@@ -35,7 +35,7 @@ NewRestDialog::~NewRestDialog()
     delete ui;
 }
 
-Rest* NewRestDialog::rest() const
+Rest* NewRestDialog::createRest() const
 {
     if (isInterval())
         return new IntervalRest(ui->editStart->dateTime(),

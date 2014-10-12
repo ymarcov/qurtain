@@ -16,7 +16,7 @@ public:
     explicit NewRestDialog(QWidget *parent = 0);
     ~NewRestDialog();
 
-    Rest* rest() const;
+    Rest* createRest() const;
 
 private slots:
     void confirmed();

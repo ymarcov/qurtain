@@ -53,7 +53,7 @@ void MainWindow::newRestDialog()
     NewRestDialog dialog;
     if (dialog.exec() == NewRestDialog::Accepted)
     {
-        rests.append(dialog.rest());
+        rests.append(dialog.createRest());
         dirty = true;
     }
 }
