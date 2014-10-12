@@ -171,7 +171,9 @@ void MainWindow::removeSelected()
     QModelIndex idx = ui->tableView->currentIndex();
     if (idx.isValid())
     {
-        rests.erase(rests.begin() + idx.row());
+        QList<Rest*>::iterator rest = rests.begin() + idx.row();
+        delete *rest;
+        rests.erase(rest);
         dirty = true;
     }
 }
